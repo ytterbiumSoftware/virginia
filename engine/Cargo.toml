@@ -5,3 +5,4 @@ authors = ["twetzel59 <twetzel59@gmail.com>"]
 
 [dependencies]
 sfml = "0.14.0"
+csfml-graphics-sys = "0.4.0"
