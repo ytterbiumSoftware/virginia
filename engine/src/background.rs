@@ -1,24 +1,27 @@
 //! Managing and drawing the background.
 
-use sfml::graphics::{Drawable, RenderStates, RenderTarget, Sprite, TextureRef};
+use sfml::graphics::{Drawable, RenderStates, RenderTarget};
+use refcounted::{RcSprite, RcTexture};
 
-pub struct Background<'s> {
-    sprite: Sprite<'s>,
+pub struct Background {
+    sprite: RcSprite,
 }
 
-impl<'s> Background<'s> {
-    pub fn new(texture: &'s TextureRef) -> Background {
+impl Background {
+    pub fn new(texture: RcTexture) -> Background {
         Background {
-            sprite: Sprite::with_texture(texture),
+            sprite: RcSprite::with_texture(texture),
         }
     }
 }
 
-impl<'s> Drawable for Background<'s> {
+impl Drawable for Background {
     fn draw<'a: 'shader, 'texture, 'shader, 'shader_texture> (
             &'a self,
             target: &mut RenderTarget,
             states: RenderStates<'texture, 'shader, 'shader_texture>) {
-        target.draw_sprite(&self.sprite, states)
+        unsafe {
+            target.draw_sprite(self.sprite.inner(), states);
+        }
     }
 }
