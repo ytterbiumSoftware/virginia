@@ -1,6 +1,8 @@
 //! Managing textures, etc.
 
 use std::collections::HashMap;
+use std::rc::Rc;
+use sfml::graphics::Texture;
 use refcounted::RcTexture;
 
 /// The top-level manager for all media resources.
@@ -24,6 +26,62 @@ impl Resources {
     /// Returns a mutable reference to the texture manager.
     pub fn textures_mut(&mut self) -> &mut TextureManager {
         &mut self.textures
+    }
+
+    /// Convenience method to add a texture from a file.
+    /// # Panics
+    /// Panics if the texture is not successfully loaded.
+    pub fn load_tex<I: ResourceId>(&mut self, idx: I, filepath: &str, options: &TexOptions) {
+        let mut tex = Texture::from_file(filepath).expect("load_tex failed");
+        options.apply_to(&mut tex);
+        self.textures.add(idx, Rc::new(tex));
+    }
+}
+
+/// Options for `Resources::load_tex`.
+/// This is a builder-type object.
+#[derive(Debug, Clone, Copy)]
+pub struct TexOptions {
+    /// Filtering to reduce jagged edges.
+    pub smooth: bool,
+    /// Will the texture repeat when coordinates
+    /// are larger than size?
+    pub repeated: bool,
+}
+
+impl TexOptions {
+    /// Begin building a `TexOptions`.
+    pub fn build() -> TexOptions {
+        Default::default()
+    }
+
+    /// Enable filtering
+    #[inline]
+    pub fn smooth(&mut self) -> &mut TexOptions {
+        self.smooth = true;
+        self
+    }
+
+    /// Enable texture repeat.
+    #[inline]
+    pub fn repeated(&mut self) -> &mut TexOptions {
+        self.repeated = true;
+        self
+    }
+
+    #[inline]
+    fn apply_to(&self, tex: &mut Texture) {
+        tex.set_smooth(self.smooth);
+        tex.set_repeated(self.repeated);
+    }
+}
+
+impl Default for TexOptions {
+    fn default() -> TexOptions {
+        TexOptions {
+            smooth: false,
+            repeated: false,
+        }
     }
 }
 

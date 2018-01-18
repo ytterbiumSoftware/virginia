@@ -95,11 +95,13 @@ impl RcSprite {
         self.inner.set_texture_rect(rect);
     }
 
+    /*
     // Return the base SFML sprite. Misuse could cause safety
     // errors, so use carefully.
     pub(crate) unsafe fn inner(&self) -> &Sprite {
         &self.inner
     }
+    */
 
     // Actually set the texture for the implementation of `self.inner`
     // and assign `Some(tex)` to `self.tex`.
