@@ -1,11 +1,13 @@
 //! Managing and drawing the background.
 
-use sfml::graphics::{Drawable, IntRect, RenderStates, RenderTarget};
+use sfml::graphics::{Color, Drawable, IntRect, PrimitiveType, RenderStates, RenderTarget,
+                     Vertex, VertexArray, ViewRef};
 use sfml::system::Vector2f;
 use refcounted::{RcSprite, RcTexture};
 
 /// A parallax-scrolling background.
 pub struct Background {
+    backdrop: Backdrop,
     layers: Vec<Layer>,
     pos: Vector2f,
 }
@@ -13,23 +15,25 @@ pub struct Background {
 impl Background {
     /// Create a new background with no layers.
     /// Will only allocate if layers are added.
-    pub fn new() -> Background {
-        Self::with_num_layers_hint(0)
+    pub fn new(view: &ViewRef, backdrop_kind: BackdropKind) -> Background {
+        Self::with_num_layers_hint(0, view, backdrop_kind)
     }
 
     /// Create a new background with no layers.
     /// **Allocates** enough memory for `num_layers_hint`
     /// layers.
-    pub fn with_num_layers_hint(num_layers_hint: usize) -> Background {
+    pub fn with_num_layers_hint(num_layers_hint: usize, view: &ViewRef,
+                                backdrop_kind: BackdropKind) -> Background {
         Background {
+            backdrop: Backdrop::new(backdrop_kind, view),
             layers: Vec::with_capacity(num_layers_hint),
             pos: (0., 0.).into(),
         }
     }
 
     /// Add a new layer on top of the existing ones.
-    pub fn add_layer_top(&mut self, texture: RcTexture, scroll_coefficent: f32) {
-        self.layers.push(Layer::new(texture, scroll_coefficent));
+    pub fn add_layer_top(&mut self, texture: RcTexture, scroll_coefficient: f32) {
+        self.layers.push(Layer::new(texture, scroll_coefficient));
     }
 
     /// Scroll the background.
@@ -39,8 +43,8 @@ impl Background {
         for i in &mut self.layers {
             let rect = i.sprite.texture_rect();
 
-            i.sprite.set_texture_rect(&IntRect::new((self.pos.x * i.coefficent) as i32,
-                                                    (self.pos.y * i.coefficent) as i32,
+            i.sprite.set_texture_rect(&IntRect::new((self.pos.x * i.coefficient) as i32,
+                                                    (self.pos.y * i.coefficient) as i32,
                                                     rect.width, rect.height));
         }
     }
@@ -51,6 +55,14 @@ impl Drawable for Background {
             &'a self,
             target: &mut RenderTarget,
             states: RenderStates<'texture, 'shader, 'shader_texture>) {
+        let states2 = RenderStates {
+            blend_mode: states.blend_mode,
+            transform: states.transform,
+            texture: states.texture,
+            shader: states.shader,
+        };
+        target.draw_with_renderstates(&self.backdrop, states2);
+
         for i in &self.layers {
             let states = RenderStates {
                 blend_mode: states.blend_mode,
@@ -71,22 +83,23 @@ pub struct BackgroundBuilder {
 
 impl BackgroundBuilder {
     /// Create a background builder object.
-    pub fn new() -> BackgroundBuilder {
-        Self::with_num_layers_hint(0)
+    pub fn new(view: &ViewRef, backdrop_kind: BackdropKind) -> BackgroundBuilder {
+        Self::with_num_layers_hint(4, view, backdrop_kind)
     }
 
     /// Create a background builder.
     /// See `Background::with_num_layers_hint`.
-    pub fn with_num_layers_hint(num_layers_hint: usize) -> BackgroundBuilder {
+    pub fn with_num_layers_hint(num_layers_hint: usize, view: &ViewRef,
+                                backdrop_kind: BackdropKind) -> BackgroundBuilder {
         BackgroundBuilder {
-            inner: Background::with_num_layers_hint(num_layers_hint),
+            inner: Background::with_num_layers_hint(num_layers_hint, view, backdrop_kind),
         }
     }
 
     /// Add a layer to the top.
     /// See `Background::add_layer_top`.
-    pub fn add(mut self, texture: RcTexture, scroll_coefficent: f32) -> BackgroundBuilder {
-        self.inner.add_layer_top(texture, scroll_coefficent);
+    pub fn add(mut self, texture: RcTexture, scroll_coefficient: f32) -> BackgroundBuilder {
+        self.inner.add_layer_top(texture, scroll_coefficient);
         self
     }
 
@@ -96,16 +109,72 @@ impl BackgroundBuilder {
     }
 }
 
+/// The possibilities for the farthest back part of a `Background`.
+#[derive(Clone, Copy, Debug)]
+pub enum BackdropKind {
+    /// A solid color.
+    Solid(Color),
+
+    // /// A vertical top-to-bottom linear gradient.
+    LinearGradient(Color, Color),
+}
+
+// Private
+// #######
+
 struct Layer {
     sprite: RcSprite,
-    coefficent: f32,
+    coefficient: f32,
 }
 
 impl Layer {
-    fn new(texture: RcTexture, coefficent: f32) -> Layer {
+    fn new(texture: RcTexture, coefficient: f32) -> Layer {
         Layer {
             sprite: RcSprite::with_texture(texture),
-            coefficent,
+            coefficient,
         }
+    }
+}
+
+struct Backdrop {
+    vao: VertexArray,
+}
+
+impl Backdrop {
+    fn new(kind: BackdropKind, view: &ViewRef) -> Backdrop {
+        use self::BackdropKind::*;
+
+        let size = view.size();
+        let mut vao = VertexArray::new(PrimitiveType::Triangles, 3);
+
+        let color = match kind {
+            Solid(c0) => {
+                (c0, c0)
+            },
+            LinearGradient(c0, c1) => {
+                (c0, c1)
+            }
+        };
+
+        vao.append(&Vertex::with_pos_color((0.,     size.y), color.1));
+        vao.append(&Vertex::with_pos_color((size.x, size.y), color.1));
+        vao.append(&Vertex::with_pos_color((size.x, 0.),     color.0));
+
+        vao.append(&Vertex::with_pos_color((0.,     0.),     color.0));
+        vao.append(&Vertex::with_pos_color((0.,     size.y), color.1));
+        vao.append(&Vertex::with_pos_color((size.x, 0.),     color.0));
+
+        Backdrop {
+            vao,
+        }
+    }
+}
+
+impl Drawable for Backdrop {
+    fn draw<'a: 'shader, 'texture, 'shader, 'shader_texture> (
+            &'a self,
+            target: &mut RenderTarget,
+            states: RenderStates<'texture, 'shader, 'shader_texture>) {
+        target.draw_with_renderstates(&self.vao, states);
     }
 }

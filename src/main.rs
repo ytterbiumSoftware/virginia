@@ -1,9 +1,10 @@
 extern crate sfml;
 extern crate engine;
 
-use sfml::graphics::{Color, RenderTarget};
+use sfml::graphics::{BlendMode, Color, RenderStates, RenderTarget};
+use sfml::graphics::blend_mode::Equation;
 use sfml::window::{Event, Key};
-use engine::background::BackgroundBuilder;
+use engine::background::{BackdropKind, BackgroundBuilder};
 //use engine::refcounted::RcSprite;
 use engine::resources::{ResourceId, Resources, TexOptions};
 use engine::window::GameWindow;
@@ -12,6 +13,7 @@ use engine::window::GameWindow;
 enum TextureId {
     Layer0,
     Layer1,
+    Layer2,
 }
 
 impl ResourceId for TextureId {
@@ -35,8 +37,9 @@ fn main() {
     //tex.set_repeated(true);
     //assert!(!res.textures_mut().add(TextureId::Layer1, Rc::new(tex)));
 
-    res.load_tex(TextureId::Layer0, "media/testing_new/Layer0.png", TexOptions::build().repeated());
-    res.load_tex(TextureId::Layer1, "media/testing_new/Layer1.png", TexOptions::build().repeated());
+    res.load_tex(TextureId::Layer0, "media/CloudLayer0.png", TexOptions::build().repeated());
+    res.load_tex(TextureId::Layer1, "media/CloudLayer1.png", TexOptions::build().repeated());
+    res.load_tex(TextureId::Layer2, "media/CloudLayer2.png", TexOptions::build().repeated());
 
     //let bg = Background::new(res.textures().get(TextureId::SpaceLayer0).unwrap());
 
@@ -45,14 +48,22 @@ fn main() {
     //tester.set_texture(tex.clone(), true);
     //tester.set_scale((10., 10.));
 
-    let mut bg = BackgroundBuilder::new()
-                                    .add(res.textures().get(TextureId::Layer0).unwrap(), 0.5)
-                                    .add(res.textures().get(TextureId::Layer1).unwrap(), 1.)
+    let bd_kind = BackdropKind::LinearGradient(Color::rgb(4, 6, 42), Color::rgb(51, 14, 35));
+    let mut bg = BackgroundBuilder::new(win.view(), bd_kind)
+                                    .add(res.textures().get(TextureId::Layer0).unwrap(), 0.125)
+                                    .add(res.textures().get(TextureId::Layer1).unwrap(), 0.25)
+                                    .add(res.textures().get(TextureId::Layer2).unwrap(), 1.)
                                     .build();
 
     'game: loop {
-        win.clear(&Color::WHITE);
-        win.draw(&bg);
+        win.clear(&Color::BLACK);
+        win.draw_with_renderstates(&bg, RenderStates {
+            blend_mode: BlendMode {
+                alpha_equation: Equation::ReverseSubtract,
+                ..Default::default()
+            },
+            ..Default::default()
+        });
         //win.draw(&tester);
         win.display();
 
