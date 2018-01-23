@@ -7,7 +7,11 @@ use sfml::window::{Event, Key};
 use engine::background::{BackdropKind, BackgroundBuilder};
 //use engine::refcounted::RcSprite;
 use engine::resources::{ResourceId, Resources, TexOptions};
+use engine::starfield;
 use engine::window::GameWindow;
+
+const SIZE: (u32, u32) = (800, 600);
+const BG_ALPHA: u8 = 128;
 
 #[derive(Clone, Copy)]
 enum TextureId {
@@ -23,7 +27,7 @@ impl ResourceId for TextureId {
 }
 
 fn main() {
-    let mut win = GameWindow::new((800, 600), "window");
+    let mut win = GameWindow::new(SIZE, "window");
 
     //let tex = Rc::new(Texture::from_file("media/tex.png").unwrap());
 
@@ -48,11 +52,14 @@ fn main() {
     //tester.set_texture(tex.clone(), true);
     //tester.set_scale((10., 10.));
 
+    let star = starfield::gen_stars_gas_rctex(SIZE);
+
     let bd_kind = BackdropKind::LinearGradient(Color::rgb(4, 6, 42), Color::rgb(51, 14, 35));
     let mut bg = BackgroundBuilder::new(win.view(), bd_kind)
-                                    .add(res.textures().get(TextureId::Layer0).unwrap(), 0.125)
-                                    .add(res.textures().get(TextureId::Layer1).unwrap(), 0.25)
-                                    .add(res.textures().get(TextureId::Layer2).unwrap(), 1.)
+                                    .add(star, 0., 255)
+                                    .add(res.textures().get(TextureId::Layer0).unwrap(), 0.125, BG_ALPHA)
+                                    .add(res.textures().get(TextureId::Layer1).unwrap(), 0.25, BG_ALPHA)
+                                    .add(res.textures().get(TextureId::Layer2).unwrap(), 1., BG_ALPHA)
                                     .build();
 
     'game: loop {

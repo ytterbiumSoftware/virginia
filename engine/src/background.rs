@@ -32,8 +32,8 @@ impl Background {
     }
 
     /// Add a new layer on top of the existing ones.
-    pub fn add_layer_top(&mut self, view: &ViewRef, texture: RcTexture, scroll_coefficient: f32) {
-        self.layers.push(Layer::new(view, texture, scroll_coefficient));
+    pub fn add_layer_top(&mut self, view: &ViewRef, texture: RcTexture, scroll_coefficient: f32, alpha: u8) {
+        self.layers.push(Layer::new(view, texture, scroll_coefficient, alpha));
     }
 
     /// Scroll the background.
@@ -100,8 +100,8 @@ impl<'a> BackgroundBuilder<'a> {
 
     /// Add a layer to the top.
     /// See `Background::add_layer_top`.
-    pub fn add(mut self, texture: RcTexture, scroll_coefficient: f32) -> BackgroundBuilder<'a> {
-        self.inner.add_layer_top(self.view, texture, scroll_coefficient);
+    pub fn add(mut self, texture: RcTexture, scroll_coefficient: f32, alpha: u8) -> BackgroundBuilder<'a> {
+        self.inner.add_layer_top(self.view, texture, scroll_coefficient, alpha);
         self
     }
 
@@ -130,11 +130,12 @@ struct Layer {
 }
 
 impl Layer {
-    fn new(view: &ViewRef, texture: RcTexture, coefficient: f32) -> Layer {
+    fn new(view: &ViewRef, texture: RcTexture, coefficient: f32, alpha: u8) -> Layer {
         let tex_size = texture.size();
         let tex_size = Vector2f::new(tex_size.x as f32, tex_size.y as f32);
         let view_size = view.size();
         let mut sprite = RcSprite::with_texture(texture);
+        sprite.set_color(&Color::rgba(255, 255, 255, alpha));
 
         if view_size.x > tex_size.x || view_size.y > tex_size.y {
             sprite.set_scale((view_size.x / tex_size.x,
