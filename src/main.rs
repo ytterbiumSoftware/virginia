@@ -37,9 +37,9 @@ fn main() {
     //tex.set_repeated(true);
     //assert!(!res.textures_mut().add(TextureId::Layer1, Rc::new(tex)));
 
-    res.load_tex(TextureId::Layer0, "media/CloudLayer0.png", TexOptions::build().repeated());
-    res.load_tex(TextureId::Layer1, "media/CloudLayer1.png", TexOptions::build().repeated());
-    res.load_tex(TextureId::Layer2, "media/CloudLayer2.png", TexOptions::build().repeated());
+    res.load_tex(TextureId::Layer0, "media/CloudLayer0.png", TexOptions::build().repeated().smooth());
+    res.load_tex(TextureId::Layer1, "media/CloudLayer1.png", TexOptions::build().repeated().smooth());
+    res.load_tex(TextureId::Layer2, "media/CloudLayer2.png", TexOptions::build().repeated().smooth());
 
     //let bg = Background::new(res.textures().get(TextureId::SpaceLayer0).unwrap());
 

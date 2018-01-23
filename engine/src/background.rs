@@ -1,7 +1,7 @@
 //! Managing and drawing the background.
 
 use sfml::graphics::{Color, Drawable, IntRect, PrimitiveType, RenderStates, RenderTarget,
-                     Vertex, VertexArray, ViewRef};
+                     Transformable, Vertex, VertexArray, ViewRef};
 use sfml::system::Vector2f;
 use refcounted::{RcSprite, RcTexture};
 
@@ -32,8 +32,8 @@ impl Background {
     }
 
     /// Add a new layer on top of the existing ones.
-    pub fn add_layer_top(&mut self, texture: RcTexture, scroll_coefficient: f32) {
-        self.layers.push(Layer::new(texture, scroll_coefficient));
+    pub fn add_layer_top(&mut self, view: &ViewRef, texture: RcTexture, scroll_coefficient: f32) {
+        self.layers.push(Layer::new(view, texture, scroll_coefficient));
     }
 
     /// Scroll the background.
@@ -77,29 +77,31 @@ impl Drawable for Background {
 }
 
 ///// A builder for `Background`.
-pub struct BackgroundBuilder {
+pub struct BackgroundBuilder<'a> {
     inner: Background,
+    view: &'a ViewRef,
 }
 
-impl BackgroundBuilder {
+impl<'a> BackgroundBuilder<'a> {
     /// Create a background builder object.
-    pub fn new(view: &ViewRef, backdrop_kind: BackdropKind) -> BackgroundBuilder {
+    pub fn new(view: &'a ViewRef, backdrop_kind: BackdropKind) -> BackgroundBuilder {
         Self::with_num_layers_hint(4, view, backdrop_kind)
     }
 
     /// Create a background builder.
     /// See `Background::with_num_layers_hint`.
-    pub fn with_num_layers_hint(num_layers_hint: usize, view: &ViewRef,
+    pub fn with_num_layers_hint(num_layers_hint: usize, view: &'a ViewRef,
                                 backdrop_kind: BackdropKind) -> BackgroundBuilder {
         BackgroundBuilder {
             inner: Background::with_num_layers_hint(num_layers_hint, view, backdrop_kind),
+            view
         }
     }
 
     /// Add a layer to the top.
     /// See `Background::add_layer_top`.
-    pub fn add(mut self, texture: RcTexture, scroll_coefficient: f32) -> BackgroundBuilder {
-        self.inner.add_layer_top(texture, scroll_coefficient);
+    pub fn add(mut self, texture: RcTexture, scroll_coefficient: f32) -> BackgroundBuilder<'a> {
+        self.inner.add_layer_top(self.view, texture, scroll_coefficient);
         self
     }
 
@@ -128,9 +130,19 @@ struct Layer {
 }
 
 impl Layer {
-    fn new(texture: RcTexture, coefficient: f32) -> Layer {
+    fn new(view: &ViewRef, texture: RcTexture, coefficient: f32) -> Layer {
+        let tex_size = texture.size();
+        let tex_size = Vector2f::new(tex_size.x as f32, tex_size.y as f32);
+        let view_size = view.size();
+        let mut sprite = RcSprite::with_texture(texture);
+
+        if view_size.x > tex_size.x || view_size.y > tex_size.y {
+            sprite.set_scale((view_size.x / tex_size.x,
+                              view_size.y / tex_size.y));
+        }
+
         Layer {
-            sprite: RcSprite::with_texture(texture),
+            sprite,
             coefficient,
         }
     }
