@@ -1,10 +1,12 @@
 extern crate sfml;
 extern crate engine;
 
+use std::time::Instant;
 use sfml::graphics::{BlendMode, Color, RenderStates, RenderTarget};
 use sfml::graphics::blend_mode::Equation;
 use sfml::window::{Event, Key};
 use engine::background::{BackdropKind, BackgroundBuilder};
+use engine::entity::{Entity, EntityPhysics, SpriteEntity};
 //use engine::refcounted::RcSprite;
 use engine::resources::{ResourceId, Resources, TexOptions};
 use engine::starfield;
@@ -18,6 +20,7 @@ enum TextureId {
     Layer0,
     Layer1,
     Layer2,
+    TestTex,
 }
 
 impl ResourceId for TextureId {
@@ -44,6 +47,7 @@ fn main() {
     res.load_tex(TextureId::Layer0, "media/CloudLayer0.png", TexOptions::build().repeated().smooth());
     res.load_tex(TextureId::Layer1, "media/CloudLayer1.png", TexOptions::build().repeated().smooth());
     res.load_tex(TextureId::Layer2, "media/CloudLayer2.png", TexOptions::build().repeated().smooth());
+    res.load_tex(TextureId::TestTex, "media/testing_old/tex.png", &Default::default());
 
     //let bg = Background::new(res.textures().get(TextureId::SpaceLayer0).unwrap());
 
@@ -62,7 +66,17 @@ fn main() {
                                     .add(res.textures().get(TextureId::Layer2).unwrap(), 1., BG_ALPHA)
                                     .build();
 
+    let mut s_entity = SpriteEntity::with_texture_phys(res.textures().get(TextureId::TestTex).unwrap(),
+                                                       EntityPhysics {
+                                                           pos: (400., 350.).into(),
+                                                           vel: (5., 5.).into(),
+                                                           ..Default::default()
+                                                       });
+
+    let mut delta = 0.;
     'game: loop {
+        let begin = Instant::now();
+
         win.clear(&Color::BLACK);
         win.draw_with_renderstates(&bg, RenderStates {
             blend_mode: BlendMode {
@@ -72,6 +86,7 @@ fn main() {
             ..Default::default()
         });
         //win.draw(&tester);
+        win.draw(&s_entity);
         win.display();
 
         while let Some(ev) = win.poll_event() {
@@ -88,5 +103,11 @@ fn main() {
                 _ => {},
             }
         }
+
+        s_entity.update(delta);
+
+        let delta_dur = Instant::now() - begin;
+            delta = delta_dur.as_secs() as f32
+                    + delta_dur.subsec_nanos() as f32 * 1e-9;
     }
 }

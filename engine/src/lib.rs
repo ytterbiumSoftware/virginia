@@ -5,6 +5,7 @@ extern crate noise;
 extern crate sfml;
 
 pub mod background;
+pub mod entity;
 pub mod refcounted;
 pub mod resources;
 pub mod starfield;
