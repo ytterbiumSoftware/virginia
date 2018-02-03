@@ -15,6 +15,9 @@ pub struct EntityPhysics {
     /// Velocity - change in `pos` per unit time.
     pub vel: Vector2f,
 
+    /// Acceleration - change in change per unit time.
+    pub acc: Vector2f,
+
     /// Current rotation **in degrees**.
     pub rot: f32,
 
@@ -25,7 +28,10 @@ pub struct EntityPhysics {
 impl EntityPhysics {
     /// Simulate one frame.
     pub fn update(&mut self, delta: f32) {
+        self.vel += self.acc * delta;
+
         self.pos += self.vel * delta;
+
         self.rot += self.rot_vel * delta;
     }
 }
@@ -35,6 +41,7 @@ impl Default for EntityPhysics {
         EntityPhysics {
             pos: Vector2f::new(0., 0.),
             vel: Vector2f::new(0., 0.),
+            acc: Vector2f::new(0., 0.),
             rot: 0.,
             rot_vel: 0.,
         }

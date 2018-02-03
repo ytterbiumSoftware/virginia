@@ -20,7 +20,7 @@ enum TextureId {
     Layer0,
     Layer1,
     Layer2,
-    TestTex,
+    Spaceship0,
 }
 
 impl ResourceId for TextureId {
@@ -47,7 +47,7 @@ fn main() {
     res.load_tex(TextureId::Layer0, "media/CloudLayer0.png", TexOptions::build().repeated().smooth());
     res.load_tex(TextureId::Layer1, "media/CloudLayer1.png", TexOptions::build().repeated().smooth());
     res.load_tex(TextureId::Layer2, "media/CloudLayer2.png", TexOptions::build().repeated().smooth());
-    res.load_tex(TextureId::TestTex, "media/testing_old/tex.png", &Default::default());
+    res.load_tex(TextureId::Spaceship0, "media/Spaceship0.png", &Default::default());
 
     //let bg = Background::new(res.textures().get(TextureId::SpaceLayer0).unwrap());
 
@@ -56,20 +56,21 @@ fn main() {
     //tester.set_texture(tex.clone(), true);
     //tester.set_scale((10., 10.));
 
-    let star = starfield::gen_stars_gas_rctex(SIZE);
+    //let star = starfield::gen_stars_gas_rctex(SIZE);
 
     let bd_kind = BackdropKind::LinearGradient(Color::rgb(4, 6, 42), Color::rgb(51, 14, 35));
     let mut bg = BackgroundBuilder::new(win.view(), bd_kind)
-                                    .add(star, 0., 255)
+                                    //.add(star, 0., 255)
                                     .add(res.textures().get(TextureId::Layer0).unwrap(), 0.125, BG_ALPHA)
                                     .add(res.textures().get(TextureId::Layer1).unwrap(), 0.25, BG_ALPHA)
                                     .add(res.textures().get(TextureId::Layer2).unwrap(), 1., BG_ALPHA)
                                     .build();
 
-    let mut s_entity = SpriteEntity::with_texture_phys(res.textures().get(TextureId::TestTex).unwrap(),
+    let mut s_entity = SpriteEntity::with_texture_phys(res.textures().get(TextureId::Spaceship0).unwrap(),
                                                        EntityPhysics {
                                                            pos: (400., 350.).into(),
                                                            vel: (5., 5.).into(),
+                                                           acc: (0.5, 0.5).into(),
                                                            ..Default::default()
                                                        });
 
