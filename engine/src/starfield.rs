@@ -15,11 +15,10 @@ const SCALE_DOWN: u32 = 10; */
 const GAS_THRESHOLD: f32 = 0.35;
 
 // The threshold above which a star pixel is placed.
-const STAR_THRESHOLD: f32 = 0.1;
+const STAR_THRESHOLD: f32 = 0.42;
 
-// The density of the stars. Smaller values indicate
-// **higher** density.
-const STAR_DENSITY: i32 = 64;
+// The density of the stars.
+const STAR_DENSITY: f32 = 20.;
 
 // The multiplier on the noise input.
 const MULTI: f32 = 0.002;
@@ -34,8 +33,8 @@ const COLOR_INFLUENCE: f32 = 3.;
 const RANGE_OFFSET: f32 = 0.7072;
 
 // Color of stars at their edges.
-const STAR_ALPHA_NEAR: u8 = 50;
-const STAR_ALPHA_FAR: u8 = 25;
+const STAR_ALPHA_NEAR: u8 = 220;
+const STAR_ALPHA_FAR: u8 = 50;
 
 /// Generate stars and gas on a transparent background.
 /// # Panics
@@ -52,18 +51,39 @@ pub fn gen_stars_gas(size: (u32, u32)) -> Image {
 
     for x in 0..size.0 {
         for y in 0..size.1 {
-            let (fx, fy) = (x as f32 * MULTI, y as f32 * MULTI);
+            let (fx, fy) = (x as f32, y as f32);
+            let (fxm, fym) = (fx * MULTI, fy * MULTI);
 
-            let value = perlin.get([fx, fy]);
+            let value = perlin.get([fxm, fym]);
             if value > GAS_THRESHOLD {
                 let mut color = GAS_COLOR;
                 color.a += ((value + RANGE_OFFSET) * COLOR_INFLUENCE) as u8;
 
                 img.set_pixel(x, y, &color);
+
+                let star_factor = perlin.get([fxm * 10., fym * 10.]);
+                //let (nx, ny) = (x as i32, y as i32);
+                if x >= 2 && y >= 2 &&
+                        star_factor > STAR_THRESHOLD &&
+                        (1. / fx.cos() * 26.).round() % STAR_DENSITY == 0.
+                        && fy % STAR_DENSITY == 0. {
+                    for dx in 0..3 {
+                        for dy in 0..3 {
+                            let color = if dx == 1 && dy == 1 {
+                                Color::rgba(255, 255, 255, STAR_ALPHA_NEAR)
+                            } else {
+                                Color::rgba(255, 255, 255, STAR_ALPHA_FAR)
+                            };
+
+                            img.set_pixel(x - dx, y - dy, &color);
+                        }
+                    }
+                }
             } else {
                 img.set_pixel(x, y, &Color::TRANSPARENT);
             }
 
+            /*
             let (nx, ny) = (x as i32, y as i32);
             if x > 2 && y > 2 &&
                     (nx + ny) % STAR_DENSITY == 0 && (nx - ny) % STAR_DENSITY == 0 &&
@@ -86,6 +106,7 @@ pub fn gen_stars_gas(size: (u32, u32)) -> Image {
                     }
                 }
             }
+            */
         }
     }
 
