@@ -4,6 +4,8 @@ pub use self::sprite_entity::SpriteEntity;
 
 pub mod sprite_entity;
 
+pub const TICKS_SEC: u32 = 45;
+
 use sfml::system::Vector2f;
 
 /// The transformation on a entity, as well as it's velocity.
@@ -23,16 +25,21 @@ pub struct EntityPhysics {
 
     /// Rotational velocity - change in `rot` per unit time **in degrees**.
     pub rot_vel: f32,
+
+    /// Rotational acceleration - chance in change per unit time **in degrees**.
+    pub rot_acc: f32,
 }
 
 impl EntityPhysics {
     /// Simulate one frame.
-    pub fn update(&mut self, delta: f32) {
-        self.vel += self.acc * delta;
+    pub fn update(&mut self) {
+        self.vel += self.acc;
 
-        self.pos += self.vel * delta;
+        self.pos += self.vel;
 
-        self.rot += self.rot_vel * delta;
+        self.rot_vel += self.rot_acc;
+
+        self.rot += self.rot_vel;
     }
 }
 
@@ -44,6 +51,7 @@ impl Default for EntityPhysics {
             acc: Vector2f::new(0., 0.),
             rot: 0.,
             rot_vel: 0.,
+            rot_acc: 0.,
         }
     }
 }
@@ -51,7 +59,5 @@ impl Default for EntityPhysics {
 /// Functionality of an entity.
 pub trait Entity {
     /// Perform per-frame logic.
-    /// # Arguments
-    /// * delta: The amount of time since the last frame in seconds.
-    fn update(&mut self, delta: f32);
+    fn update(&mut self);
 }
