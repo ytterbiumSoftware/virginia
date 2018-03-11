@@ -59,8 +59,8 @@ impl SpriteEntity {
 }
 
 impl Entity for SpriteEntity {
-    fn update(&mut self, delta: f32) {
-        self.phys.update(delta);
+    fn update(&mut self) {
+        self.phys.update();
         self.sprite.set_position(self.phys.pos);
         self.sprite.set_rotation(self.phys.rot);
     }

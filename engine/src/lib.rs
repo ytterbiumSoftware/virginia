@@ -6,6 +6,7 @@ extern crate sfml;
 
 pub mod background;
 pub mod entity;
+pub mod input;
 pub mod refcounted;
 pub mod resources;
 pub mod starfield;
