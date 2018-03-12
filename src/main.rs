@@ -75,6 +75,8 @@ fn main() {
                                                            ..Default::default()
                                                        });
 
+    //let original_view = win.view().to_owned();
+
     let mut last_tick: u64 = 0;
     let begin = Instant::now();
     'game: loop {
@@ -95,6 +97,7 @@ fn main() {
         }
 
         win.clear(&Color::BLACK);
+        win.reset_view();
         win.draw_with_renderstates(&bg, RenderStates {
             blend_mode: BlendMode {
                 alpha_equation: Equation::ReverseSubtract,
@@ -102,6 +105,7 @@ fn main() {
             },
             ..Default::default()
         });
+        win.center_view_on(&s_entity);
         //win.draw(&tester);
         win.draw(&s_entity);
         win.display();

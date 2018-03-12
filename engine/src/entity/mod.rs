@@ -60,4 +60,10 @@ impl Default for EntityPhysics {
 pub trait Entity {
     /// Perform per-frame logic.
     fn update(&mut self);
+
+    /// Access the physics component.
+    fn phys(&self) -> &EntityPhysics;
+
+    /// Mutably access the physics component.
+    fn phys_mut(&mut self) -> &mut EntityPhysics;
 }

@@ -4,7 +4,7 @@ use sfml::graphics::{Drawable, RenderStates, RenderTarget, Transformable};
 use super::{Entity, EntityPhysics};
 use refcounted::{RcSprite, RcTexture};
 
-/// A transformable, visable entity that is composed of an `RcSprite`
+/// A visable entity that is composed of an `RcSprite`
 /// and an `EntityTransform`.
 
 pub struct SpriteEntity {
@@ -46,16 +46,6 @@ impl SpriteEntity {
     pub fn rc_sprite_mut(&mut self) -> &mut RcSprite {
         &mut self.sprite
     }
-
-    /// Access the physics component.
-    pub fn phys(&self) -> &EntityPhysics {
-        &self.phys
-    }
-
-    /// Mutably access the physics component.
-    pub fn phys_mut(&mut self) -> &mut EntityPhysics {
-        &mut self.phys
-    }
 }
 
 impl Entity for SpriteEntity {
@@ -63,6 +53,14 @@ impl Entity for SpriteEntity {
         self.phys.update();
         self.sprite.set_position(self.phys.pos);
         self.sprite.set_rotation(self.phys.rot);
+    }
+
+    fn phys(&self) -> &EntityPhysics {
+        &self.phys
+    }
+
+    fn phys_mut(&mut self) -> &mut EntityPhysics {
+        &mut self.phys
     }
 }
 
