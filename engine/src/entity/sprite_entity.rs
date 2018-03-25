@@ -6,7 +6,6 @@ use refcounted::{RcSprite, RcTexture};
 
 /// A visable entity that is composed of an `RcSprite`
 /// and an `EntityTransform`.
-
 pub struct SpriteEntity {
     sprite: RcSprite,
     phys: EntityPhysics,

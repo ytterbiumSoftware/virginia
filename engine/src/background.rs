@@ -96,7 +96,7 @@ impl Drawable for Background {
     }
 }
 
-///// A builder for `Background`.
+/// A builder for `Background`.
 pub struct BackgroundBuilder<'a> {
     inner: Background,
     view: &'a ViewRef,
@@ -137,7 +137,7 @@ pub enum BackdropKind {
     /// A solid color.
     Solid(Color),
 
-    // /// A vertical top-to-bottom linear gradient.
+    /// A vertical top-to-bottom linear gradient.
     LinearGradient(Color, Color),
 }
 
