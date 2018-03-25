@@ -36,6 +36,7 @@ impl Background {
         self.layers.push(Layer::new(view, texture, scroll_coefficient, alpha));
     }
 
+    /*
     /// Scroll the background.
     pub fn scroll<V: Into<Vector2f>>(&mut self, scroll: V) {
         self.pos += scroll.into();
@@ -46,6 +47,25 @@ impl Background {
             i.sprite.set_texture_rect(&IntRect::new((self.pos.x * i.coefficient) as i32,
                                                     (self.pos.y * i.coefficient) as i32,
                                                     rect.width, rect.height));
+        }
+    }
+    */
+
+    /// Scroll the background in relation to a ``View`` (**``ViewRef``**) of a ``RenderTarget``.
+    /// Note that the size of the view and the view's rotation is not accounted for by this
+    /// method.
+    pub fn scroll(&mut self, view: &ViewRef) {
+        let center = view.center();
+        let size = view.size();
+        self.pos = (center.x - size.x / 2.,
+                    center.y - size.y / 2.).into();
+
+        for i in &mut self.layers {
+            let rect = i.sprite.texture_rect();
+
+            i.sprite.set_texture_rect(&IntRect::new((self.pos.x * i.coefficient) as i32,
+                                                    (self.pos.y * i.coefficient) as i32,
+                                                     rect.width, rect.height));
         }
     }
 }

@@ -13,6 +13,7 @@ pub struct SpriteEntity {
 }
 
 impl SpriteEntity {
+    /*
     /// Create a new `SpriteEntity` with no texture, upper-left at (0., 0.).
     pub fn new() -> SpriteEntity {
         SpriteEntity {
@@ -20,19 +21,25 @@ impl SpriteEntity {
             phys: Default::default(),
         }
     }
+    */
 
-    /// Create a new `SpriteEntity` with a texture, upper-left at (0., 0.).
+    /// Create a new `SpriteEntity` with a texture, centered at the texture center.
     pub fn with_texture(tex: RcTexture) -> SpriteEntity {
-        SpriteEntity {
-            sprite: RcSprite::with_texture(tex),
-            phys: Default::default(),
-        }
+        Self::with_texture_phys(tex, Default::default())
     }
 
-    /// Create a new `SpriteEntity` with a texture and `EntityPhysics`.
+    /// Create a new `SpriteEntity` with a texture and `EntityPhysics`, centered at
+    /// the texture center.
     pub fn with_texture_phys(tex: RcTexture, phys: EntityPhysics) -> SpriteEntity {
+        let size = tex.size();
+
+        let mut sprite = RcSprite::with_texture(tex);
+        sprite.set_origin((size.x as f32 / 2., size.y as f32 / 2.));
+
+        Self::update_sprite(&phys, &mut sprite);
+
         SpriteEntity {
-            sprite: RcSprite::with_texture(tex),
+            sprite,
             phys,
         }
     }
@@ -46,13 +53,17 @@ impl SpriteEntity {
     pub fn rc_sprite_mut(&mut self) -> &mut RcSprite {
         &mut self.sprite
     }
+
+    fn update_sprite(phys: &EntityPhysics, sprite: &mut RcSprite) {
+        sprite.set_position(phys.pos);
+        sprite.set_rotation(phys.rot);
+    }
 }
 
 impl Entity for SpriteEntity {
     fn update(&mut self) {
         self.phys.update();
-        self.sprite.set_position(self.phys.pos);
-        self.sprite.set_rotation(self.phys.rot);
+        Self::update_sprite(&self.phys, &mut self.sprite);
     }
 
     fn phys(&self) -> &EntityPhysics {

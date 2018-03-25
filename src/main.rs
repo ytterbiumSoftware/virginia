@@ -59,19 +59,19 @@ fn main() {
     //let star = starfield::gen_stars_gas_rctex(SIZE);
 
     let bd_kind = BackdropKind::LinearGradient(Color::rgb(4, 6, 42), Color::rgb(51, 14, 35));
-    let bg = BackgroundBuilder::new(win.view(), bd_kind)
-                                    //.add(star, 0., 255)
-                                    .add(res.textures().get(TextureId::Layer0).unwrap(), 0.125, BG_ALPHA)
-                                    .add(res.textures().get(TextureId::Layer1).unwrap(), 0.25, BG_ALPHA)
-                                    .add(res.textures().get(TextureId::Layer2).unwrap(), 1., BG_ALPHA)
-                                    .build();
+    let mut bg = BackgroundBuilder::new(win.view(), bd_kind)
+                                        //.add(star, 0., 255)
+                                        .add(res.textures().get(TextureId::Layer0).unwrap(), 0.125, BG_ALPHA)
+                                        .add(res.textures().get(TextureId::Layer1).unwrap(), 0.25, BG_ALPHA)
+                                        .add(res.textures().get(TextureId::Layer2).unwrap(), 1., BG_ALPHA)
+                                        .build();
 
     let mut s_entity = SpriteEntity::with_texture_phys(res.textures().get(TextureId::Spaceship0).unwrap(),
                                                        EntityPhysics {
                                                            pos: (25., 25.).into(),
                                                            vel: (0., 0.).into(),
                                                            acc: (0.025, 0.025).into(),
-                                                           rot_acc: 0.01,
+                                                           rot_acc: 0.002,
                                                            ..Default::default()
                                                        });
 
@@ -88,6 +88,8 @@ fn main() {
             s_entity.update();
         }
         last_tick = final_tick_frame;
+
+        bg.scroll(win.view());
 
         while let Some(ev) = win.poll_event() {
             match ev {
