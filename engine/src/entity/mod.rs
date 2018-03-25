@@ -40,6 +40,10 @@ impl EntityPhysics {
         self.rot_vel += self.rot_acc;
 
         self.rot += self.rot_vel;
+
+        if self.rot > 360. {
+            self.rot -= 360.;
+        }
     }
 }
 
