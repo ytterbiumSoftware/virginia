@@ -1,6 +1,5 @@
 extern crate sfml;
 extern crate engine;
-extern crate virginia;
 
 use std::time::Instant;
 use sfml::graphics::{BlendMode, Color, RenderStates, RenderTarget};
@@ -12,10 +11,23 @@ use engine::entity::{TICKS_SEC, Entity, EntityPhysics, SpriteEntity};
 use engine::resources::{ResourceId, Resources, TexOptions};
 //use engine::starfield;
 use engine::window::GameWindow;
-use virginia::*;
 
 const SIZE: (u32, u32) = (800, 600);
 const BG_ALPHA: u8 = 128;
+
+#[derive(Clone, Copy)]
+enum TextureId {
+    Layer0,
+    Layer1,
+    Layer2,
+    Spaceship0,
+}
+
+impl ResourceId for TextureId {
+    fn resource_id(&self) -> usize {
+        *self as usize
+    }
+}
 
 fn main() {
     let mut win = GameWindow::new(SIZE, "window");
