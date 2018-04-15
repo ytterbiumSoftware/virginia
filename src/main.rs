@@ -6,7 +6,8 @@ use sfml::graphics::{BlendMode, Color, RenderStates, RenderTarget};
 use sfml::graphics::blend_mode::Equation;
 use sfml::window::Event;
 use engine::background::{BackdropKind, BackgroundBuilder};
-use engine::entity::{TICKS_SEC, Entity, EntityPhysics, SpriteEntity};
+use engine::entity::{TICKS_SEC, Entity, SpriteEntity};
+use engine::input::Inputs;
 //use engine::refcounted::RcSprite;
 use engine::resources::{ResourceId, Resources, TexOptions};
 //use engine::starfield;
@@ -60,20 +61,15 @@ fn main() {
 
     let bd_kind = BackdropKind::LinearGradient(Color::rgb(4, 6, 42), Color::rgb(51, 14, 35));
     let mut bg = BackgroundBuilder::new(win.view(), bd_kind)
-                                        //.add(star, 0., 255)
-                                        .add(res.textures().get(TextureId::Layer0).unwrap(), 0.125, BG_ALPHA)
-                                        .add(res.textures().get(TextureId::Layer1).unwrap(), 0.25, BG_ALPHA)
-                                        .add(res.textures().get(TextureId::Layer2).unwrap(), 1., BG_ALPHA)
-                                        .build();
+        //.add(star, 0., 255)
+        .add(res.textures().get(TextureId::Layer0).unwrap(), 0.125, BG_ALPHA)
+        .add(res.textures().get(TextureId::Layer1).unwrap(), 0.25, BG_ALPHA)
+        .add(res.textures().get(TextureId::Layer2).unwrap(), 1., BG_ALPHA)
+        .build();
 
-    let mut s_entity = SpriteEntity::with_texture_phys(res.textures().get(TextureId::Spaceship0).unwrap(),
-                                                       EntityPhysics {
-                                                           pos: (25., 25.).into(),
-                                                           vel: (0., 0.).into(),
-                                                           acc: (0.025, 0.025).into(),
-                                                           rot_acc: 0.002,
-                                                           ..Default::default()
-                                                       });
+    let mut s_entity = SpriteEntity::with_texture_mass(
+        res.textures().get(TextureId::Spaceship0).unwrap(),
+        1.);
 
     //let original_view = win.view().to_owned();
 
@@ -96,6 +92,24 @@ fn main() {
                 Event::Closed => break 'game,
                 _ => {},
             }
+        }
+
+        let keys = Inputs::current(&win).keys;
+
+        if keys.right {
+            s_entity.phys_mut().apply_force((0.05, 0.));
+        }
+
+        if keys.left {
+            s_entity.phys_mut().apply_force((-0.05, 0.));
+        }
+
+        if keys.up {
+            s_entity.phys_mut().apply_force((0., -0.05));
+        }
+
+        if keys.down {
+            s_entity.phys_mut().apply_force((0., 0.05));
         }
 
         win.clear(&Color::BLACK);

@@ -37,7 +37,7 @@ impl GameWindow {
         let mut view = self.inner.view().to_owned();
 
         let phys = entity.phys();
-        view.set_center((phys.pos.x, phys.pos.y));
+        view.set_center((phys.pos().x, phys.pos().y));
 
         self.inner.set_view(&view);
     }

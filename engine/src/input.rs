@@ -7,7 +7,7 @@ use window::GameWindow;
 #[derive(Debug)]
 pub struct Inputs {
     /// Current keyboard state.
-    keys: KeyStates,
+    pub keys: KeyStates,
 }
 
 impl Inputs {
@@ -30,16 +30,16 @@ impl Inputs {
 #[derive(Debug, Default)]
 pub struct KeyStates {
     /// Up cursor key.
-    up: bool,
+    pub up: bool,
 
     /// Doen cursor key.
-    down: bool,
+    pub down: bool,
 
     /// Left cursor key.
-    left: bool,
+    pub left: bool,
 
     /// Right cursor key.
-    right: bool,
+    pub right: bool,
 }
 
 impl KeyStates {

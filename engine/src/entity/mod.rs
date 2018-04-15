@@ -12,53 +12,70 @@ use sfml::system::Vector2f;
 #[derive(Debug)]
 pub struct EntityPhysics {
     /// Current position.
-    pub pos: Vector2f,
+    pos: Vector2f,
 
     /// Velocity - change in `pos` per unit time.
-    pub vel: Vector2f,
+    vel: Vector2f,
 
-    /// Acceleration - change in change per unit time.
-    pub acc: Vector2f,
+    // Force - the force experienced by the object this frame.
+    force: Vector2f,
 
-    /// Current rotation **in degrees**.
-    pub rot: f32,
-
-    /// Rotational velocity - change in `rot` per unit time **in degrees**.
-    pub rot_vel: f32,
-
-    /// Rotational acceleration - chance in change per unit time **in degrees**.
-    pub rot_acc: f32,
+    // Mass - the mass of the object.
+    mass: f32,
 }
 
 impl EntityPhysics {
-    /// Simulate one frame.
-    pub fn update(&mut self) {
-        self.vel += self.acc;
+    /// Create a new entity physics component that has all values except for mass zeroed.
+    pub fn new(mass: f32) -> EntityPhysics {
+        EntityPhysics {
+            pos: Vector2f::new(0., 0.),
+            vel: Vector2f::new(0., 0.),
+            force: Vector2f::new(0., 0.),
+            mass,
+        }
+    }
 
+    /// Simulate one frame. This will set ``self.force`` to ``(0., 0.)``.
+    pub fn update(&mut self) {
+        // F = ma
+        // am = F
+        // a = F / m
+
+        self.vel += self.force / self.mass;
         self.pos += self.vel;
 
-        self.rot_vel += self.rot_acc;
+        self.force = Vector2f::new(0., 0.);
+    }
 
-        self.rot += self.rot_vel;
+    /// Apply a force to the object at the object's center.
+    /// This will cause linear motion, and will not induce torque or rotation.
+    pub fn apply_force<T: Into<Vector2f>>(&mut self, f: T) {
+        self.force += f.into();
+    }
 
-        if self.rot > 360. {
-            self.rot -= 360.;
-        }
+    /// Current position.
+    pub fn pos(&self) -> Vector2f {
+        self.pos
+    }
+
+    /// Velocity - change in `pos` per unit time.
+    pub fn vel(&self) -> Vector2f {
+        self.vel
     }
 }
 
+/*
 impl Default for EntityPhysics {
     fn default() -> EntityPhysics {
         EntityPhysics {
             pos: Vector2f::new(0., 0.),
             vel: Vector2f::new(0., 0.),
-            acc: Vector2f::new(0., 0.),
-            rot: 0.,
-            rot_vel: 0.,
-            rot_acc: 0.,
+            force: Vector2f::new(0., 0.),
+            mass: 1.,
         }
     }
 }
+*/
 
 /// Functionality of an entity.
 pub trait Entity {
