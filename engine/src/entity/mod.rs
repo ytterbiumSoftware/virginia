@@ -14,7 +14,10 @@ pub struct EntityPhysics {
     /// Current position.
     pos: Vector2f,
 
-    /// Velocity - change in `pos` per unit time.
+    // Momentum - velocity * mass.
+    momentum: Vector2f,
+
+    /// Velocity - change in `pos` per unit time. Must be kept consistent with momentum.
     vel: Vector2f,
 
     // Force - the force experienced by the object this frame.
@@ -29,6 +32,7 @@ impl EntityPhysics {
     pub fn new(mass: f32) -> EntityPhysics {
         EntityPhysics {
             pos: Vector2f::new(0., 0.),
+            momentum: Vector2f::new(0., 0.),
             vel: Vector2f::new(0., 0.),
             force: Vector2f::new(0., 0.),
             mass,
@@ -37,13 +41,16 @@ impl EntityPhysics {
 
     /// Simulate one frame. This will set ``self.force`` to ``(0., 0.)``.
     pub fn update(&mut self) {
-        // F = ma
-        // am = F
-        // a = F / m
+        self.momentum += self.force;
 
-        self.vel += self.force / self.mass;
+        // p = mv
+        // vm = p
+        // v = p / m
+        self.vel = self.momentum / self.mass;
+
         self.pos += self.vel;
 
+        // Reset the force for next frame.
         self.force = Vector2f::new(0., 0.);
     }
 
