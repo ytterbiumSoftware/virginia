@@ -4,7 +4,7 @@ extern crate engine;
 use std::time::Instant;
 use sfml::graphics::{BlendMode, Color, RenderStates, RenderTarget};
 use sfml::graphics::blend_mode::Equation;
-use sfml::window::Event;
+use sfml::window::{mouse, Event};
 use engine::background::{BackdropKind, BackgroundBuilder};
 use engine::entity::{TICKS_SEC, Entity, EntityPhysics, SpriteEntity};
 use engine::input::Inputs;
@@ -71,9 +71,9 @@ fn main() {
         res.textures().get(TextureId::Spaceship0).unwrap(),
         EntityPhysics::with_damping(1., 2., 0.02, 0.02));
 
-    let mut s_entity2 = SpriteEntity::with_texture_phys(
-        res.textures().get(TextureId::Spaceship0).unwrap(),
-        EntityPhysics::with_damping_pos(1., 1., 0.02, 0.02, (0., -200.)));
+    //let mut s_entity2 = SpriteEntity::with_texture_phys(
+    //    res.textures().get(TextureId::Spaceship0).unwrap(),
+    //    EntityPhysics::with_damping_pos(1., 1., 0.02, 0.02, (0., -200.)));
 
 
     //let original_view = win.view().to_owned();
@@ -87,7 +87,7 @@ fn main() {
         for _ in last_tick..final_tick_frame {
             //println!("{} {}", last_tick, i);
             s_entity.update();
-            s_entity2.update();
+            //s_entity2.update();
         }
         last_tick = final_tick_frame;
 
@@ -104,32 +104,39 @@ fn main() {
 
         if keys.right {
             s_entity.phys_mut().apply_force((0.05, 0.));
-            s_entity2.phys_mut().apply_force((0.05, 0.));
+            //s_entity2.phys_mut().apply_force((0.05, 0.));
         }
 
         if keys.left {
             s_entity.phys_mut().apply_force((-0.05, 0.));
-            s_entity2.phys_mut().apply_force((-0.05, 0.));
+            //s_entity2.phys_mut().apply_force((-0.05, 0.));
         }
 
         if keys.up {
             s_entity.phys_mut().apply_force((0., -0.05));
-            s_entity2.phys_mut().apply_force((0., -0.05));
+            //s_entity2.phys_mut().apply_force((0., -0.05));
         }
 
         if keys.down {
             s_entity.phys_mut().apply_force((0., 0.05));
-            s_entity2.phys_mut().apply_force((0., 0.05));
+            //s_entity2.phys_mut().apply_force((0., 0.05));
         }
 
         if keys.a {
             s_entity.phys_mut().apply_torque(-0.01);
-            s_entity2.phys_mut().apply_torque(-0.01);
+            //s_entity2.phys_mut().apply_torque(-0.01);
         }
 
         if keys.d {
             s_entity.phys_mut().apply_torque(0.01);
-            s_entity2.phys_mut().apply_torque(0.01);
+            //s_entity2.phys_mut().apply_torque(0.01);
+        }
+
+        if mouse::Button::Left.is_pressed() {
+            let coords = win.map_pixel_to_coords_current_view(&win.mouse_position());
+            println!("coords: {:?}", coords);
+
+            s_entity.phys_mut().apply_force_at((0.05, 0.), coords);
         }
 
         win.clear(&Color::BLACK);
@@ -144,7 +151,7 @@ fn main() {
         win.center_view_on(&s_entity);
         //win.draw(&tester);
         win.draw(&s_entity);
-        win.draw(&s_entity2);
+        //win.draw(&s_entity2);
         win.display();
     }
 }

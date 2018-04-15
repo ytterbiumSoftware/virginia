@@ -121,6 +121,24 @@ impl EntityPhysics {
         self.force += f.into();
     }
 
+    /// Apply a force at a point in world coords.
+    /// This will induce linear motion **and** rotational motion.
+    pub fn apply_force_at<T1, T2>(&mut self, force: T1, point: T2)
+        where T1: Into<Vector2f>,
+              T2: Into<Vector2f>
+    {
+        // This is just the force and point as Vector2f's. For convenience tuples
+        // can be passed to this method and they will be converted to a Vector2f.
+        let force = force.into();
+        let point = point.into();
+        let center = self.pos;
+
+        self.apply_force(force);
+
+        let dist = point - center;
+        self.apply_torque(-((force.x * dist.y) - (force.y * dist.x)));
+    }
+
     /// Apply a torque.
     /// This will induce only rotational motion.
     pub fn apply_torque(&mut self, t: f32) {
