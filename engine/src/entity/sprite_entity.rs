@@ -22,11 +22,6 @@ impl SpriteEntity {
     }
     */
 
-    /// Create a new `SpriteEntity` with a texture and mass, centered at the texture center.
-    pub fn with_texture_mass(tex: RcTexture, mass: f32) -> SpriteEntity {
-        Self::with_texture_phys(tex, EntityPhysics::new(mass))
-    }
-
     /// Create a new `SpriteEntity` with a texture and `EntityPhysics`, centered at
     /// the texture center.
     pub fn with_texture_phys(tex: RcTexture, phys: EntityPhysics) -> SpriteEntity {
@@ -55,6 +50,7 @@ impl SpriteEntity {
 
     fn update_sprite(phys: &EntityPhysics, sprite: &mut RcSprite) {
         sprite.set_position(phys.pos());
+        sprite.set_rotation(phys.rot());
     }
 }
 

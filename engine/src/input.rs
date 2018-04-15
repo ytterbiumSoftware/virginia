@@ -40,6 +40,12 @@ pub struct KeyStates {
 
     /// Right cursor key.
     pub right: bool,
+
+    /// A key.
+    pub a: bool,
+
+    /// D key.
+    pub d: bool,
 }
 
 impl KeyStates {
@@ -50,6 +56,8 @@ impl KeyStates {
             down: Key::Down.is_pressed(),
             left: Key::Left.is_pressed(),
             right: Key::Right.is_pressed(),
+            a: Key::A.is_pressed(),
+            d: Key::D.is_pressed(),
         }
     }
 }

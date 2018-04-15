@@ -6,7 +6,7 @@ use sfml::graphics::{BlendMode, Color, RenderStates, RenderTarget};
 use sfml::graphics::blend_mode::Equation;
 use sfml::window::Event;
 use engine::background::{BackdropKind, BackgroundBuilder};
-use engine::entity::{TICKS_SEC, Entity, SpriteEntity};
+use engine::entity::{TICKS_SEC, Entity, EntityPhysics, SpriteEntity};
 use engine::input::Inputs;
 //use engine::refcounted::RcSprite;
 use engine::resources::{ResourceId, Resources, TexOptions};
@@ -67,9 +67,9 @@ fn main() {
         .add(res.textures().get(TextureId::Layer2).unwrap(), 1., BG_ALPHA)
         .build();
 
-    let mut s_entity = SpriteEntity::with_texture_mass(
+    let mut s_entity = SpriteEntity::with_texture_phys(
         res.textures().get(TextureId::Spaceship0).unwrap(),
-        1.);
+        EntityPhysics::new(1., 1.));
 
     //let original_view = win.view().to_owned();
 
@@ -110,6 +110,14 @@ fn main() {
 
         if keys.down {
             s_entity.phys_mut().apply_force((0., 0.05));
+        }
+
+        if keys.a {
+            s_entity.phys_mut().apply_torque(-0.01);
+        }
+
+        if keys.d {
+            s_entity.phys_mut().apply_torque(0.01);
         }
 
         win.clear(&Color::BLACK);
