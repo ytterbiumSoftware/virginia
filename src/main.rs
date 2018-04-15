@@ -69,7 +69,12 @@ fn main() {
 
     let mut s_entity = SpriteEntity::with_texture_phys(
         res.textures().get(TextureId::Spaceship0).unwrap(),
-        EntityPhysics::new(1., 1.));
+        EntityPhysics::with_damping(1., 2., 0.02, 0.02));
+
+    let mut s_entity2 = SpriteEntity::with_texture_phys(
+        res.textures().get(TextureId::Spaceship0).unwrap(),
+        EntityPhysics::with_damping_pos(1., 1., 0.02, 0.02, (0., -200.)));
+
 
     //let original_view = win.view().to_owned();
 
@@ -82,6 +87,7 @@ fn main() {
         for _ in last_tick..final_tick_frame {
             //println!("{} {}", last_tick, i);
             s_entity.update();
+            s_entity2.update();
         }
         last_tick = final_tick_frame;
 
@@ -98,26 +104,32 @@ fn main() {
 
         if keys.right {
             s_entity.phys_mut().apply_force((0.05, 0.));
+            s_entity2.phys_mut().apply_force((0.05, 0.));
         }
 
         if keys.left {
             s_entity.phys_mut().apply_force((-0.05, 0.));
+            s_entity2.phys_mut().apply_force((-0.05, 0.));
         }
 
         if keys.up {
             s_entity.phys_mut().apply_force((0., -0.05));
+            s_entity2.phys_mut().apply_force((0., -0.05));
         }
 
         if keys.down {
             s_entity.phys_mut().apply_force((0., 0.05));
+            s_entity2.phys_mut().apply_force((0., 0.05));
         }
 
         if keys.a {
             s_entity.phys_mut().apply_torque(-0.01);
+            s_entity2.phys_mut().apply_torque(-0.01);
         }
 
         if keys.d {
             s_entity.phys_mut().apply_torque(0.01);
+            s_entity2.phys_mut().apply_torque(0.01);
         }
 
         win.clear(&Color::BLACK);
@@ -132,6 +144,7 @@ fn main() {
         win.center_view_on(&s_entity);
         //win.draw(&tester);
         win.draw(&s_entity);
+        win.draw(&s_entity2);
         win.display();
     }
 }
