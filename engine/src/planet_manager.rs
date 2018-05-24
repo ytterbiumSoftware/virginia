@@ -8,7 +8,7 @@ use refcounted::RcTexture;
 use util::Vector2Ext;
 
 const GRAVITY_CUTOFF: f32 = 100.;
-const GRAVITATIONAL_CONSTANT: f32 = 5.0e-3;
+const GRAVITATIONAL_CONSTANT: f32 = 0.5;
 
 /// Drawable collection of planets.
 pub struct PlanetManager {
@@ -41,7 +41,7 @@ impl PlanetManager {
                 let magnitude_sq_recip = 1. / difference_len_sq;
                 if !magnitude_sq_recip.is_infinite() {
                     //println!("{:?}", magnitude_sq_recip);
-                    entity_phys.apply_force(difference * i.entity.phys().mass() * entity_mass
+                    entity_phys.apply_force(difference.normalize() * i.entity.phys().mass() * entity_mass
                         * magnitude_sq_recip * GRAVITATIONAL_CONSTANT);
                 }
             }
