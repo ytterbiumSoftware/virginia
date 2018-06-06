@@ -85,8 +85,13 @@ fn main() {
         res.textures().get(TextureId::Planet0).unwrap(),
         1000., (200., 20.));
 
+    let planet2 = Planet::new(
+        res.textures().get(TextureId::Planet0).unwrap(),
+        1000., (-200., -20.));
+
     let mut planet_manager = PlanetManager::new();
     planet_manager.add_planet(planet);
+    planet_manager.add_planet(planet2);
 
     let mut last_tick: u64 = 0;
     let begin = Instant::now();
@@ -101,8 +106,8 @@ fn main() {
         }
         last_tick = final_tick_frame;
 
-        bg.scroll(win.view());
         planet_manager.affect_entity(&mut s_entity);
+        bg.scroll(win.view());
 
         while let Some(ev) = win.poll_event() {
             match ev {
