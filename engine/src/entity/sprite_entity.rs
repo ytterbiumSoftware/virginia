@@ -19,6 +19,7 @@ impl SpriteEntity {
             sprite: RcSprite::new(),
             phys: Default::default(),
         }
+    inner: RenderWindow,
     }
     */
 

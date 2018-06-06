@@ -8,6 +8,7 @@ use sfml::window::{mouse, Event};
 use engine::background::{BackdropKind, BackgroundBuilder};
 use engine::entity::{TICKS_SEC, Entity, EntityPhysics, SpriteEntity};
 use engine::input::Inputs;
+use engine::planet_manager::{Planet, PlanetManager};
 //use engine::refcounted::RcSprite;
 use engine::resources::{ResourceId, Resources, TexOptions};
 //use engine::starfield;
@@ -22,6 +23,7 @@ enum TextureId {
     Layer1,
     Layer2,
     Spaceship0,
+    Planet0,
 }
 
 impl ResourceId for TextureId {
@@ -49,6 +51,7 @@ fn main() {
     res.load_tex(TextureId::Layer1, "media/CloudLayer1.png", TexOptions::build().repeated().smooth());
     res.load_tex(TextureId::Layer2, "media/CloudLayer2.png", TexOptions::build().repeated().smooth());
     res.load_tex(TextureId::Spaceship0, "media/Spaceship0.png", &Default::default());
+    res.load_tex(TextureId::Planet0, "media/Planet0.png", &Default::default());
 
     //let bg = Background::new(res.textures().get(TextureId::SpaceLayer0).unwrap());
 
@@ -62,9 +65,9 @@ fn main() {
     let bd_kind = BackdropKind::LinearGradient(Color::rgb(4, 6, 42), Color::rgb(51, 14, 35));
     let mut bg = BackgroundBuilder::new(win.view(), bd_kind)
         //.add(star, 0., 255)
-        .add(res.textures().get(TextureId::Layer0).unwrap(), 0.125, BG_ALPHA)
+        .add(res.textures().get(TextureId::Layer0).unwrap(), 0.0625, BG_ALPHA)
         .add(res.textures().get(TextureId::Layer1).unwrap(), 0.25, BG_ALPHA)
-        .add(res.textures().get(TextureId::Layer2).unwrap(), 1., BG_ALPHA)
+        .add(res.textures().get(TextureId::Layer2).unwrap(), 0.5, BG_ALPHA)
         .build();
 
     let mut s_entity = SpriteEntity::with_texture_phys(
@@ -77,6 +80,18 @@ fn main() {
 
 
     //let original_view = win.view().to_owned();
+
+    let planet = Planet::new(
+        res.textures().get(TextureId::Planet0).unwrap(),
+        1000., (200., 20.));
+
+    let planet2 = Planet::new(
+        res.textures().get(TextureId::Planet0).unwrap(),
+        1000., (-200., -20.));
+
+    let mut planet_manager = PlanetManager::new();
+    planet_manager.add_planet(planet);
+    planet_manager.add_planet(planet2);
 
     let mut last_tick: u64 = 0;
     let begin = Instant::now();
@@ -91,6 +106,7 @@ fn main() {
         }
         last_tick = final_tick_frame;
 
+        planet_manager.affect_entity(&mut s_entity);
         bg.scroll(win.view());
 
         while let Some(ev) = win.poll_event() {
@@ -149,6 +165,7 @@ fn main() {
             ..Default::default()
         });
         win.center_view_on(&s_entity);
+        win.draw(&planet_manager);
         //win.draw(&tester);
         win.draw(&s_entity);
         //win.draw(&s_entity2);

@@ -45,6 +45,7 @@ version = "0.1.0"
 dependencies = [
  "csfml-graphics-sys 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
  "noise 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
+ "num-traits 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
  "sfml 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -79,6 +80,11 @@ dependencies = [
 [[package]]
 name = "num-traits"
 version = "0.1.42"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+
+[[package]]
+name = "num-traits"
+version = "0.2.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
@@ -126,6 +132,7 @@ dependencies = [
 "checksum libc 0.2.36 (registry+https://github.com/rust-lang/crates.io-index)" = "1e5d97d6708edaa407429faa671b942dc0f2727222fb6b6539bf1db936e4b121"
 "checksum noise 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "77152bd10ae7b1dd2968c5dc7e4f4341ebe306bf8f48990c52fe1ae39a1d0033"
 "checksum num-traits 0.1.42 (registry+https://github.com/rust-lang/crates.io-index)" = "9936036cc70fe4a8b2d338ab665900323290efb03983c86cbe235ae800ad8017"
+"checksum num-traits 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)" = "775393e285254d2f5004596d69bb8bc1149754570dcc08cf30cabeba67955e28"
 "checksum rand 0.3.20 (registry+https://github.com/rust-lang/crates.io-index)" = "512870020642bb8c221bf68baa1b2573da814f6ccfe5c9699b1c303047abe9b1"
 "checksum sfml 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)" = "47b06f9db4d3f8b936d232d92bfbd6335060ae51ddcf1be2e79361aeb5c8fef1"
 "checksum sfml-build 0.2.0 (registry+https://github.com/rust-lang/crates.io-index)" = "ff35ae173aff95bc967d1b4f0e131a8aec384c317fd057738da4b0f71c8cf841"

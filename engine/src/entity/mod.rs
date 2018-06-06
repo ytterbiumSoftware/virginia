@@ -192,6 +192,16 @@ impl EntityPhysics {
         self.angular_damping
     }
 
+    /// Return the mass of the object.
+    pub fn mass(&self) -> f32 {
+        self.mass
+    }
+
+    /// Return the rotational inertia of the object.
+    pub fn rotational_inertia(&self) -> f32 {
+        self.rotational_inertia
+    }
+
     /*
     /// Velocity - change in `pos` per unit time.
     pub fn vel(&self) -> Vector2f {
