@@ -101,12 +101,12 @@ fn main() {
                                 since.subsec_nanos() as f64 * 1e-9 * TICKS_SEC as f64) as u64;
         for _ in last_tick..final_tick_frame {
             //println!("{} {}", last_tick, i);
+            planet_manager.affect_entity(&mut s_entity);
             s_entity.update();
             //s_entity2.update();
         }
         last_tick = final_tick_frame;
 
-        planet_manager.affect_entity(&mut s_entity);
         bg.scroll(win.view());
 
         while let Some(ev) = win.poll_event() {
